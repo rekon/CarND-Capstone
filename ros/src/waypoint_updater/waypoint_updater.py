@@ -93,8 +93,8 @@ class WaypointUpdater(object):
 
 
     def gen_lane(self,closest_idx):
-        if(self.last_close_waypoint_idx == closest_idx):
-            return self.last_lane_wp;
+        # if(self.last_close_waypoint_idx == closest_idx):
+        #     return self.last_lane_wp;
 
         lane = Lane();
         lane.header = self.base_waypoints.header;
@@ -110,8 +110,8 @@ class WaypointUpdater(object):
             #rospy.loginfo("WaypointUpdater : Found a Non Red Light Ahead!!");
             #rospy.loginfo("WaypointUpdater : gen_lane : %s",self.stop_line_wp_idx);l
             lane.waypoints = self.base_waypoints.waypoints[closest_idx : farthest_idx];
-        self.last_close_waypoint_idx = closest_idx;
-        self.last_lane_wp = lane;
+        # self.last_close_waypoint_idx = closest_idx;
+        # self.last_lane_wp = lane;
         return lane;
 
     def is_red_light_ahead(self):
