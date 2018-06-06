@@ -23,6 +23,8 @@ class TLDetector(object):
         self.waypoints = None # all waypoints
         self.camera_image = None
         self.lights = [] # All Traffic lights info
+        self.waypoints_2d = None;
+        self.waypoint_tree = None;
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -51,8 +53,6 @@ class TLDetector(object):
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
-        self.waypoints_2d = None;
-        self.waypoint_tree = None;
 
         rospy.spin();
 
@@ -138,7 +138,15 @@ class TLDetector(object):
         #rospy.loginfo("get_light_state")
         if not (self.config['tl']['is_carla']):
             #rospy.loginfo("get_light_state : Simulator detected")
-            return light.state;
+            # return light.state;
+            if(not self.has_image):
+                self.prev_light_loc = None
+                return False
+
+            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+
+            #Get classification
+            return self.light_classifier.get_classification(cv_image)
         else:
             if(not self.has_image):
                 self.prev_light_loc = None
