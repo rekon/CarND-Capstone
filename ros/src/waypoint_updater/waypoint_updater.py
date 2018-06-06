@@ -110,6 +110,7 @@ class WaypointUpdater(object):
             #rospy.loginfo("WaypointUpdater : Found a Non Red Light Ahead!!");
             #rospy.loginfo("WaypointUpdater : gen_lane : %s",self.stop_line_wp_idx);l
             lane.waypoints = self.base_waypoints.waypoints[closest_idx : farthest_idx];
+        self.last_close_waypoint_idx = closest_idx;
         self.last_lane_wp = lane;
         return lane;
 
