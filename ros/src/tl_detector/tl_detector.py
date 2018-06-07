@@ -147,17 +147,17 @@ class TLDetector(object):
         #rospy.loginfo("get_light_state")
         if not (self.config['tl']['is_carla']):
             
-            return light.state
-            # if(not self.has_image):
-            #     self.prev_light_loc = None
-            #     return False
+            # return light.state
+            if(not self.has_image):
+                self.prev_light_loc = None
+                return False
 
-            # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
-            # #Get classification
-            # result = self.light_classifier.get_classification(cv_image)
-            # # rospy.loginfo('Detected %s', result)
-            # return result
+            #Get classification
+            result = self.light_classifier.get_classification(cv_image)
+            # rospy.loginfo('Detected %s', result)
+            return result
         else:
             if(not self.has_image):
                 self.prev_light_loc = None
