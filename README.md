@@ -1,6 +1,6 @@
 # Team Members
 
-**Arindam Baidya arindam.baidya01@infosys.com**
+**Arindam Baidya arindam.baidya01@infosys.com** - _Team Lead_
 
 **Nagarjuna Vemuri nagarjuna.vemuri@infosys.com**
 
