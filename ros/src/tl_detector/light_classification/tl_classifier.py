@@ -62,6 +62,9 @@ class TLClassifier(object):
                     if type(scores)!= None and len(scores) > 0:
                         image_class = np.argmax(scores)
 
+                        #for sim_tl_classifier 0=>red 1=>green 2=>yellow 3=>not_light
+                        #for real_tl_classifier 0=>red 1=>green/yellow 2=>not_light
+                        
                         if image_class == 0:
                             return TrafficLight.RED
                         elif image_class == 1:

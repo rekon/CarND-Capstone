@@ -101,8 +101,10 @@ class TLDetector(object):
         elif (self.state_count >= STATE_COUNT_THRESHOLD) and (self.last_state != self.state):
             if (state == TrafficLight.RED):
                 rospy.loginfo("Red Light Decteded!!");
+            elif (state == TrafficLight.GREEN)
+                rospy.loginfo("Green Light Decteded!!");
             else:
-                rospy.loginfo("Non Red Light Decteded!!");
+                rospy.loginfo("No Light Decteded!!");
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
@@ -146,7 +148,9 @@ class TLDetector(object):
             cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
             #Get classification
-            return self.light_classifier.get_classification(cv_image)
+            result = self.light_classifier.get_classification(cv_image)
+            # rospy.loginfo('Detected %s', result)
+            return result
         else:
             if(not self.has_image):
                 self.prev_light_loc = None
