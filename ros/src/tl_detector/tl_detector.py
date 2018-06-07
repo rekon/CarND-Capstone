@@ -181,17 +181,18 @@ class TLDetector(object):
             car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x,self.pose.pose.position.y);
 
         #DONE : find the closest visible traffic light (if one exists)
-
+        closest_line_dist = len(self.waypoints.waypoints);
         for i,light in enumerate(self.lights):
             cur_stop_line_pos = stop_line_positions[i];
             cur_stop_line_wp_idx = self.get_closest_waypoint(cur_stop_line_pos[0],cur_stop_line_pos[1]);
 
             # initializing closest light distance
-            closest_line_dist = len(self.waypoints.waypoints);
             cur_line_dist = cur_stop_line_wp_idx - car_wp_idx;
             # Checking If stop line is in front of the car (dist>0)
-            if cur_line_dist >= 0 and cur_line_dist < closest_line_dist:
-                closest_light_dist = cur_line_dist;
+            #rospy.logwarn(" tl_detector : i: %s cur_stop_line_pos: %s ,cur_stop_line_wp_idx : %s ,closest_line_dist : %s ,cur_line_dist: %s", i,cur_stop_line_pos,
+            #             cur_stop_line_wp_idx, closest_line_dist, cur_line_dist);
+            if 0 <= cur_line_dist < closest_line_dist:
+                closest_line_dist = cur_line_dist;
                 closest_light = light;
                 closest_line_wp_idx = cur_stop_line_wp_idx;
 

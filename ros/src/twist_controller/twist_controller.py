@@ -22,6 +22,8 @@ class Controller(object):
         tau = 0.5 #cut-off freq
         ts = 0.02 #sample time
         self.vel_lpf = LowPassFilter(tau, ts)
+        self.steer_lpf = LowPassFilter(tau, ts)
+        
         
         self.vehicle_mass = vehicle_mass
         self.fuel_capacity = fuel_capacity
@@ -46,6 +48,8 @@ class Controller(object):
         vel_error = linear_vel - current_vel
         self.last_vel = current_vel
         
+        self.steer_lpf.filt(steering);
+        
         current_time = rospy.get_time()
         sample_time = current_time - self.last_time
         self.last_time = current_time
@@ -55,7 +59,7 @@ class Controller(object):
         
         if linear_vel == 0 and current_vel < 0.1:
             throttle = 0
-            brake = 400 #400Nm to hold the car in place
+            brake = 700 #700Nm to hold the car in place
             
         elif throttle < 0.1 and vel_error < 0:
             throttle = 0
