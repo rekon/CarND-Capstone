@@ -14,6 +14,7 @@ import cv2
 import yaml
 
 STATE_COUNT_THRESHOLD = 3
+FRAME_SKIP_THRESHOLD = 2
 
 class TLDetector(object):
     def __init__(self):
@@ -25,6 +26,7 @@ class TLDetector(object):
         self.lights = [] # All Traffic lights info
         self.waypoints_2d = None;
         self.waypoint_tree = None;
+        self.skip_frame_count = 0;
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -82,6 +84,12 @@ class TLDetector(object):
 
         """
         #rospy.loginfo("image_cb")
+        self.skip_frame_count = (self.skip_frame_count+1)%(FRAME_SKIP_THRESHOLD+1)
+        if self.skip_frame_count > 0:
+            # rospy.loginfo('Frame skipped, %d', self.skip_frame_count)
+            return
+        # rospy.loginfo('Frame taken, %d', self.skip_frame_count)
+
         self.has_image = True
         self.camera_image = msg
         light_wp, state = self.process_traffic_lights()
@@ -100,11 +108,11 @@ class TLDetector(object):
             self.state = state
         elif (self.state_count >= STATE_COUNT_THRESHOLD) and (self.last_state != self.state):
             if (state == TrafficLight.RED):
-                rospy.loginfo("Red Light Decteded!!");
-            elif (state == TrafficLight.GREEN)
-                rospy.loginfo("Green Light Decteded!!");
+                rospy.loginfo("Red Light Detected!!");
+            elif (state == TrafficLight.GREEN):
+                rospy.loginfo("Green Light Detected!!");
             else:
-                rospy.loginfo("No Light Decteded!!");
+                rospy.loginfo("No Light Detected!!");
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
