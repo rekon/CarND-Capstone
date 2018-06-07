@@ -28,10 +28,11 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 
 LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this number
 MAX_DECEL = 0.5;
+STOP_BUFFER_WP = 4;
 
 class WaypointUpdater(object):
     def __init__(self):
-        rospy.init_node('waypoint_updater',log_level=rospy.INFO);
+        rospy.init_node('waypoint_updater',log_level=rospy.DEBUG);
 
         # DONE: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
@@ -101,7 +102,7 @@ class WaypointUpdater(object):
 
         farthest_idx = closest_idx + LOOKAHEAD_WPS;
         # If Red Light detected
-        if self.is_red_light_ahead():
+        if self.is_red_light_ahead(closest_idx):
             rospy.logdebug("WaypointUpdater : Found a Red Light Ahead!!");
             # rospy.logwarn("WaypointUpdater : gen_lane : %s", self.stop_line_wp_idx)
             lane.waypoints = self.decelerate_to_stop(closest_idx, farthest_idx);
@@ -114,8 +115,8 @@ class WaypointUpdater(object):
         # self.last_lane_wp = lane;
         return lane;
 
-    def is_red_light_ahead(self):
-        return not ((self.stop_line_wp_idx == None) or (self.stop_line_wp_idx == -1) or (self.stop_line_wp_idx > len(self.base_waypoints.waypoints)));
+    def is_red_light_ahead(self,closest_idx):
+        return not ((self.stop_line_wp_idx == None) or (self.stop_line_wp_idx == -1) or (self.stop_line_wp_idx > len(self.base_waypoints.waypoints))  and (self.stop_line_wp_idx - STOP_BUFFER_WP <closest_idx));
 
     def decelerate_to_stop_dummy(self,closest_idx, farthest_idx):
         waypoints = deepcopy(self.base_waypoints.waypoints[closest_idx:farthest_idx+1]);
@@ -126,7 +127,7 @@ class WaypointUpdater(object):
 
     def decelerate_to_stop(self,closest_idx, farthest_idx):
         # to stop car's front before stop_line
-        stop_line_wp_idx_local = self.stop_line_wp_idx - 2;
+        stop_line_wp_idx_local = self.stop_line_wp_idx - STOP_BUFFER_WP;
 
         waypoints_before_stop_line = [];
         waypoints_after_stop_line = [];
@@ -134,8 +135,10 @@ class WaypointUpdater(object):
         # If stop line is in our range of LOOKAHEAD_WPS
         if(farthest_idx >= stop_line_wp_idx_local):
             #last_wp_idx = stop_line_wp_idx_local;
-            waypoints_before_stop_line = deepcopy(self.base_waypoints.waypoints[closest_idx : stop_line_wp_idx_local+1]);
-            waypoints_after_stop_line = deepcopy(self.base_waypoints.waypoints[stop_line_wp_idx_local+1 : farthest_idx+1]);
+            waypoints_before_stop_line = deepcopy(self.base_waypoints.waypoints[closest_idx : stop_line_wp_idx_local]);
+            waypoints_after_stop_line = deepcopy(self.base_waypoints.waypoints[stop_line_wp_idx_local : farthest_idx+1]);
+            for i,wp in enumerate(waypoints_after_stop_line):
+                wp.twist.twist.linear.x = 0.0;
             total_dist = 0.0;
         else:
             #last_wp_idx = farthest_idx;
